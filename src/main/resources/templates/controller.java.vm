@@ -1,0 +1,95 @@
+package ${package.Controller};
+
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
+import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.vo.ApiResponse;
+import ${package.Service}.${table.serviceName};
+import ${package.Entity}.${entity};
+#if(${restControllerStyle})
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+
+/**
+ * <p>
+ * $!{table.comment} 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@RestController
+@RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+public class ${table.controllerName} {
+
+    @Resource
+    private ${table.serviceName} ${table.entityPath}Service;
+
+    /**
+     * 查询所有接口
+     * @return
+     */
+    @GetMapping
+    public ApiResponse findAll() {
+        return ApiResponse.success(${table.entityPath}Service.list());
+    }
+    /**
+     * 根据id查询数据接口
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public ApiResponse findOne(@PathVariable("id") Integer id) {
+        return ApiResponse.success(${table.entityPath}Service.getById(id));
+    }
+    /**
+     * 分页查询接口
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/page")
+    public ApiResponse findPage(@RequestParam("pageNum") Integer pageNum,@RequestParam("pageSize") Integer pageSize) {
+        QueryWrapper<${entity}> queryWrapper = new QueryWrapper<>();
+        return ApiResponse.success(${table.entityPath}Service.page(new Page<>(pageNum, pageSize), queryWrapper));
+    }
+    /**
+     * 新增和更新接口
+     * @param user
+     * @return
+     */
+    @PostMapping("/save")
+    public ApiResponse save(@RequestBody ${entity} ${table.entityPath}) {
+        boolean isSuccess = ${table.entityPath}Service.saveOrUpdate(${table.entityPath});
+        return isSuccess?ApiResponse.success():ApiResponse.fail("更新失败");
+    }
+    /**
+     * 删除接口
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/del/{id}")
+    public ApiResponse delete(@PathVariable("id") Integer id) {
+        boolean isSuccess = ${table.entityPath}Service.removeById(id);
+        return isSuccess?ApiResponse.success():ApiResponse.fail("删除失败");
+    }
+    /**
+     * 批量删除接口
+     * @param ids
+     * @return
+     */
+    @PostMapping("/del/batch")
+    public ApiResponse deleteBatch(@RequestBody List<Integer> ids) {
+        boolean isSuccess = ${table.entityPath}Service.removeByIds(ids);
+        return isSuccess?ApiResponse.success():ApiResponse.fail("批量删除失败");
+    }
+
+}
